@@ -1,0 +1,11 @@
+boto3
+botocore
+ipywidgets==8.1.2
+langchain==0.1.15
+langchain-community==0.0.32
+langchain-core==0.1.41
+langchain-text-splitters==0.0.1
+opensearch-py==2.5.0
+requests-aws4auth==1.2.3
+promptcraft
+bert_score
