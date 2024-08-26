@@ -5,39 +5,9 @@ Parameters:
   InstanceType:
     Type: String
     AllowedValues:
-      - ml.t3.medium
+      - ml.t3.large
     Description: 'The instance type used for the SageMaker Notebook'
-    Default: ml.t3.medium
-  AmazonBedrockFullAccess:
-    Type: String
-    Description: 'arn:aws:iam::aws:policy/AmazonBedrockFullAccess'
-    AllowedValues:
-      - arn:aws:iam::aws:policy/AmazonBedrockFullAccess
-    Default: arn:aws:iam::aws:policy/AmazonBedrockFullAccess
-  AmazonOpenSearchServiceFullAccess:
-    Type: String
-    Description: 'arn:aws:iam::aws:policy/AmazonOpenSearchServiceFullAccess'
-    AllowedValues:
-      - arn:aws:iam::aws:policy/AmazonOpenSearchServiceFullAccess
-    Default: arn:aws:iam::aws:policy/AmazonOpenSearchServiceFullAccess
-  AmazonSageMakerFullAccess:
-    Type: String
-    Description: 'arn:aws:iam::aws:policy/AmazonSageMakerFullAccess'
-    AllowedValues:
-      - arn:aws:iam::aws:policy/AmazonSageMakerFullAccess
-    Default: arn:aws:iam::aws:policy/AmazonSageMakerFullAccess
-  IAMFullAccess:
-    Type: String
-    Description: 'arn:aws:iam::aws:policy/IAMFullAccess'
-    AllowedValues:
-      - arn:aws:iam::aws:policy/IAMFullAccess
-    Default: arn:aws:iam::aws:policy/IAMFullAccess
-  AWSLambdaFullAccess:
-    Type: String
-    Description: 'arn:aws:iam::aws:policy/AWSLambda_FullAccess'
-    AllowedValues:
-      - arn:aws:iam::aws:policy/AWSLambda_FullAccess
-    Default: arn:aws:iam::aws:policy/AWSLambda_FullAccess
+    Default: ml.t3.large
 
 Resources:
   # This policy does not follow principle of least privileges and should NEVER be used in production
@@ -49,13 +19,71 @@ Resources:
         Statement:
           - Effect: Allow
             Action:
-              - bedrock:*
-              - iam:Get*
-              - iam:List*
-              - sagemaker:*
-              - s3:*
-              - aoss:*
+              - 'bedrock:ListFoundationModels'
+              - 'bedrock:InvokeModel'
+              - 'bedrock:ListGuardrails'
+              - 'bedrock:CreateGuardrail'
+              - 'bedrock:CreateGuardrailVersion'
+              - 'bedrock:GetGuardrail'
+              - 'bedrock:ApplyGuardrail'
+              - 'bedrock:UpdateGuardrail'
+              - 'bedrock:DeleteGuardrail'
+              - 'bedrock:GetFoundationModel'
+              - 'bedrock:TagResource'
+              - 'bedrock:UntagResource'
+              - 'bedrock:ListTagsForResource'
+              - 'bedrock:CreateAgent'
+              - 'bedrock:UpdateAgent'
+              - 'bedrock:GetAgent'
+              - 'bedrock:ListAgents'
+              - 'bedrock:DeleteAgent'
+              - 'bedrock:CreateAgentActionGroup'
+              - 'bedrock:UpdateAgentActionGroup'
+              - 'bedrock:GetAgentActionGroup'
+              - 'bedrock:ListAgentActionGroups'
+              - 'bedrock:DeleteAgentActionGroup'
+              - 'bedrock:GetAgentVersion'
+              - 'bedrock:ListAgentVersions'
+              - 'bedrock:DeleteAgentVersion'
+              - 'bedrock:CreateAgentAlias'
+              - 'bedrock:UpdateAgentAlias'
+              - 'bedrock:GetAgentAlias'
+              - 'bedrock:ListAgentAliases'
+              - 'bedrock:DeleteAgentAlias'
+              - 'bedrock:AssociateAgentKnowledgeBase'
+              - 'bedrock:DisassociateAgentKnowledgeBase'
+              - 'bedrock:GetKnowledgeBase'
+              - 'bedrock:ListKnowledgeBases'
+              - 'bedrock:PrepareAgent'
+              - 'bedrock:InvokeAgent'
+              - 's3:CreateBucket'
+              - 's3:ListBucket'
+              - 's3:PutObject'
+              - 's3:ListAllMyBuckets'
+              - 'iam:GetRole'
+              - 'iam:CreateRole'
+              - 'iam:AttachRolePolicy'
+              - 'lambda:CreateFunction'
+              - 'iam:PassRole'
+              - 'iam:CreatePolicy'
+              - 'lambda:AddPermission'
             Resource: "*"
+
+  AmazonBedrockExecutionRoleForAgents:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: bedrock.amazonaws.com
+          Action: sts:AssumeRole
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+        - arn:aws:iam::aws:policy/AWSLambda_FullAccess
+        - !Ref SageMakerNotebookPolicy
+      RoleName: 'AmazonBedrockExecutionRoleForAgents_csbot'
 
   SageMakerNotebookRole:
     Type: AWS::IAM::Role
@@ -73,11 +101,6 @@ Resources:
             Action: sts:AssumeRole
       ManagedPolicyArns:
         - !Ref SageMakerNotebookPolicy
-        - !Ref AmazonBedrockFullAccess
-        - !Ref AmazonOpenSearchServiceFullAccess
-        - !Ref AmazonSageMakerFullAccess
-        - !Ref IAMFullAccess
-        - !Ref AWSLambdaFullAccess
 
   SageMakerNotebookInstance:
     Type: AWS::SageMaker::NotebookInstance
