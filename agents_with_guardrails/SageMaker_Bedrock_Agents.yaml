@@ -58,7 +58,6 @@ Resources:
               - 'bedrock:InvokeAgent'
               - 'iam:GetRole'
               - 'iam:GetPolicy'
-              - 'iam:PassRole'
               - 'iam:ListPolicies'
               - 's3:ListAllMyBuckets'
             Resource: "*"
@@ -70,13 +69,17 @@ Resources:
               - 's3:PutObject'
               - 's3:GetObject'
               - 's3:DeleteObject'
-            "Resource": "arn:aws:s3:::*-agent-kb*"
+            Resource: "arn:aws:s3:::*-agent-kb*"
           - Effect: Allow
             Action:
               - 'lambda:CreateFunction'
               - 'lambda:AddPermission'
               - 'lambda:DeleteFunction'
             Resource: !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:*LambdaAgents*"
+          - Effect: Allow
+            Action:
+              - 'iam:PassRole'
+            Resource: !Sub "arn:aws:iam::${AWS::AccountId}:role/AmazonBedrockLambdaExecutionRoleForAgents*"
 
   AmazonBedrockExecutionRoleForAgentsRetailbot02:
     Type: AWS::IAM::Role
