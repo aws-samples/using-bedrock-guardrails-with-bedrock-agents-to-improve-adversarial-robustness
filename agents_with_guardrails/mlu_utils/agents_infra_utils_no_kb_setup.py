@@ -67,13 +67,13 @@ def setup_agent_infrastructure(schema_filename, kb_db_file_uri, lambda_code_uri)
     schema_key = f'{agent_name}-schema.json' # file in repo
     schema_name = schema_filename
     schema_arn = f'arn:aws:s3:::{bucket_name}/{schema_key}'
-    bedrock_agent_bedrock_allow_policy_name = f"{prefix_iam}-bedrock-allow-{suffix}"
-    bedrock_agent_s3_allow_policy_name = f"{prefix_iam}-s3-allow-{suffix}"
+    bedrock_agent_bedrock_allow_policy_name = 'SageMakerNotebookPolicy' #f"{prefix_iam}-bedrock-allow-{suffix}"
+    bedrock_agent_s3_allow_policy_name = 'RetailBotAgentRoleDefaultPolicy' #f"{prefix_iam}-s3-allow-{suffix}"
     bedrock_agent_kb_allow_policy_name = f"{prefix_iam}-kb-allow-{suffix}"
-    lambda_role_name = f'{agent_name}-lambda-role-{suffix}'
-    agent_role_name = f'AmazonBedrockExecutionRoleForAgents_{prefix_iam}'
+    lambda_role_name = 'AmazonBedrockLambdaExecutionRoleForAgentsRetailbot02' #f'{agent_name}-lambda-role-{suffix}'
+    agent_role_name = 'AmazonBedrockExecutionRoleForAgentsRetailbot02'        #f'AmazonBedrockExecutionRoleForAgents_{prefix_iam}'
     lambda_code_path = lambda_code_uri # file in repo
-    lambda_name = f'{agent_name}-{suffix}'
+    lambda_name = f'LambdaAgentsRetailbot02'
 
     ## KB with DB
     kb_db_tag = 'kbdb'
@@ -117,14 +117,33 @@ def setup_agent_infrastructure(schema_filename, kb_db_file_uri, lambda_code_uri)
     
     # Upload Knowledge Base files to this s3 bucket
     # the DDL script is required for the LLM to learn how to write queries
-    logger.info(f"kb_db_files_path :: {kb_db_files_path} kb_db_key :: {kb_db_key}")
+    print(f"kb_db_files_path :: {kb_db_files_path} kb_db_key :: {kb_db_key}")
     for f in os.listdir(kb_db_files_path):
         if f.endswith(".sql") or f.endswith("db"):
             s3_client.upload_file(kb_db_files_path+'/'+f, bucket_name, f)
 
-
+    lambda_iam_role = iam_client.get_role(
+            RoleName=lambda_role_name
+    )
+    agent_role = iam_client.get_role(
+        RoleName=agent_role_name
+    )
     
+    agent_bedrock_policy = None
+    agent_s3_schema_policy = None
+        
+    for policy in iam_client.list_policies()['Policies']:
+        #print(policy)
+        if bedrock_agent_bedrock_allow_policy_name in policy['PolicyName']:
+            agent_bedrock_policy_response = policy['Arn']
+        
+        if bedrock_agent_s3_allow_policy_name in policy['PolicyName']:
+            agent_s3_schema_policy = policy['Arn']
 
+    print(f"agent_bedrock_policy :: {agent_bedrock_policy}")
+    print(f"agent_s3_schema_policy :: {agent_s3_schema_policy}")
+    '''
+    print(f"Create IAM Role for the Lambda function")
     # Create IAM Role for the Lambda function
     try:
         assume_role_policy_document = {
@@ -147,10 +166,11 @@ def setup_agent_infrastructure(schema_filename, kb_db_file_uri, lambda_code_uri)
             RoleName=lambda_role_name,
             AssumeRolePolicyDocument=assume_role_policy_document_json
         )
-
+        #print(f"Create IAM lambda_iam_role for the Lambda function : {lambda_iam_role}")
         # Pause to make sure role is created
         time.sleep(20)
-    except:
+    except Exception as inst:
+        print(f"exception = {inst}")
         lambda_iam_role = iam_client.get_role(RoleName=lambda_role_name)
 
     iam_client.attach_role_policy(
@@ -161,7 +181,7 @@ def setup_agent_infrastructure(schema_filename, kb_db_file_uri, lambda_code_uri)
         RoleName=lambda_role_name,
         PolicyArn='arn:aws:iam::aws:policy/AmazonS3FullAccess'
     )
-
+    '''
 
     # Package up the lambda function code
     s = BytesIO()
@@ -191,6 +211,7 @@ def setup_agent_infrastructure(schema_filename, kb_db_file_uri, lambda_code_uri)
     # amazon.titan-text-premier-v1:0 and anthropic.claude-3-haiku-20240307-v1:0
     '''
 
+    '''
     bedrock_agent_bedrock_allow_policy_statement = {
         "Version": "2012-10-17",
         "Statement": [
@@ -207,7 +228,7 @@ def setup_agent_infrastructure(schema_filename, kb_db_file_uri, lambda_code_uri)
                 "Effect": "Allow",
                 "Action": "bedrock:ApplyGuardrail",
                 "Resource": [ 
-                    f"arn:aws:bedrock:us-east-1:757420736997:guardrail/an9l3icjg3kj"
+                    f"arn:aws:bedrock:{region}:{account_id}:guardrail/an9l3icjg3kj"
                 ]
             }
         ]
@@ -278,6 +299,7 @@ def setup_agent_infrastructure(schema_filename, kb_db_file_uri, lambda_code_uri)
         PolicyArn=agent_s3_schema_policy['Policy']['Arn']
     )
 
+    '''
 
     logger.info(f"bucket_name :: {bucket_name} \n agent_name :: {agent_name} \n agent_alias_name :: {agent_alias_name} \n schema_key :: {schema_key}  ")
 

@@ -56,20 +56,29 @@ Resources:
               - 'bedrock:ListKnowledgeBases'
               - 'bedrock:PrepareAgent'
               - 'bedrock:InvokeAgent'
+              - 'iam:GetRole'
+              - 'iam:GetPolicy'
+              - 'iam:PassRole'
+              - 'iam:ListPolicies'
+              - 's3:ListAllMyBuckets'
+            Resource: "*"
+          - Effect: Allow
+            Action:
               - 's3:CreateBucket'
+              - 's3:DeleteBucket'
               - 's3:ListBucket'
               - 's3:PutObject'
-              - 's3:ListAllMyBuckets'
-              - 'iam:GetRole'
-              - 'iam:CreateRole'
-              - 'iam:AttachRolePolicy'
+              - 's3:GetObject'
+              - 's3:DeleteObject'
+            "Resource": "arn:aws:s3:::*-agent-kb*"
+          - Effect: Allow
+            Action:
               - 'lambda:CreateFunction'
-              - 'iam:PassRole'
-              - 'iam:CreatePolicy'
               - 'lambda:AddPermission'
-            Resource: "*"
+              - 'lambda:DeleteFunction'
+            Resource: !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:*LambdaAgents*"
 
-  AmazonBedrockExecutionRoleForAgents:
+  AmazonBedrockExecutionRoleForAgentsRetailbot02:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -80,16 +89,82 @@ Resources:
           Action: sts:AssumeRole
       Path: /
       ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AmazonS3FullAccess
-        - arn:aws:iam::aws:policy/AWSLambda_FullAccess
+        - arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
+        - arn:aws:iam::aws:policy/service-role/AmazonS3ObjectLambdaExecutionRolePolicy
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
         - !Ref SageMakerNotebookPolicy
-      RoleName: 'AmazonBedrockExecutionRoleForAgents_csbot'
+      RoleName: 'AmazonBedrockExecutionRoleForAgentsRetailbot02'
+
+  AmazonBedrockLambdaExecutionRoleForAgentsRetailbot02:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Sub AmazonBedrockLambdaExecutionRoleForAgentsRetailbot02
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: 'sts:AssumeRole'
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
+        - arn:aws:iam::aws:policy/service-role/AmazonS3ObjectLambdaExecutionRolePolicy
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - !Ref SageMakerNotebookPolicy
+
+  RetailBotAgentRoleDefaultPolicy:
+    Type: 'AWS::IAM::Policy'
+    Properties:
+      PolicyName: !Sub ${AWS::StackName}-RetailBotAgentRoleDefaultPolicy
+      PolicyDocument:
+        Statement:
+          - Action:
+              - lambda:invokeFunction
+              - bedrock:InvokeModel
+              - bedrock:Retrieve
+              - bedrock:ApplyGuardrail
+              - s3:GetObject
+            Effect: Allow
+            Resource: '*'
+        Version: 2012-10-17
+      Roles:
+        - !Ref AmazonBedrockExecutionRoleForAgentsRetailbot02
+        - !Ref AmazonBedrockLambdaExecutionRoleForAgentsRetailbot02
+
+  AmazonBedrockAgentBedrockFoundationModelPolicy:
+    Type: 'AWS::IAM::Policy'
+    Properties:
+      PolicyName: !Sub ${AWS::StackName}-RetailBotAgentRoleDefaultPolicy
+      PolicyDocument:
+        Statement:
+          - Action:
+              - bedrock:InvokeModel
+            Effect: Allow
+            Resource: !Sub 'arn:aws:bedrock::${AWS::AccountId}:foundation-model/anthropic.claude-3-haiku-20240307-v1:0'
+        Version: 2012-10-17
+      Roles:
+        - !Ref AmazonBedrockExecutionRoleForAgentsRetailbot02
+        - !Ref AmazonBedrockLambdaExecutionRoleForAgentsRetailbot02
+
+  AmazonBedrockAgentBedrockApplyGuardrailPolicy:
+    Type: 'AWS::IAM::Policy'
+    Properties:
+      PolicyName: !Sub ${AWS::StackName}-RetailBotAgentRoleDefaultPolicy
+      PolicyDocument:
+        Statement:
+          - Action:
+              - bedrock:ApplyGuardrail
+            Effect: Allow
+            Resource: !Sub 'arn:aws:bedrock::${AWS::AccountId}:guardrail/*'
+        Version: 2012-10-17
+      Roles:
+        - !Ref AmazonBedrockExecutionRoleForAgentsRetailbot02
+        - !Ref AmazonBedrockLambdaExecutionRoleForAgentsRetailbot02
 
   SageMakerNotebookRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
-        Version: 2012-10-17
         Statement:
           - Effect: Allow
             Principal:
