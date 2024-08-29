@@ -79,7 +79,9 @@ Resources:
           - Effect: Allow
             Action:
               - 'iam:PassRole'
-            Resource: !Sub "arn:aws:iam::${AWS::AccountId}:role/AmazonBedrockLambdaExecutionRoleForAgents*"
+            Resource: 
+              - !Sub "arn:aws:iam::${AWS::AccountId}:role/AmazonBedrockLambdaExecutionRoleForAgents*"
+              - !Sub "arn:aws:iam::${AWS::AccountId}:role/AmazonBedrockExecutionRoleForAgents*"
 
   AmazonBedrockExecutionRoleForAgentsRetailbot02:
     Type: AWS::IAM::Role
