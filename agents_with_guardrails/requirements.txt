@@ -10,3 +10,5 @@ requests-aws4auth==1.2.3
 promptcraft==0.4.8
 transformers==4.36.0
 bert-score==0.3.13
+importlib_metadata==6.11.0
+setuptools==58.2.0

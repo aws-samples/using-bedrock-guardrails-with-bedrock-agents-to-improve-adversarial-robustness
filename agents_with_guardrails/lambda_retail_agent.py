@@ -10,9 +10,13 @@ import os
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-s3 = boto3.client('s3')
+session = boto3.session.Session()
+region_name = session.region_name
+
+s3 = boto3.client('s3', region_name = region_name)
+
 bucket = os.environ.get('BUCKET_NAME')  #Name of bucket with data file and OpenAPI file
-logger.info(f'bucket :::: {bucket}')
+logger.info(f'bucket :::: {bucket} and region_name :::: {region_name}')
 db_name = 'demo_csbot_db' #Location of data file in S3
 local_db = '/tmp/csbot.db' #Location in Lambda /tmp folder where data file will be copied
 
