@@ -6,6 +6,8 @@ This repository contains a couple of notebooks for the __Bedrock Agents__ class 
 
 __Project : Using Bedrock Guardrails with Bedrock Agents to Improve Adversarial Robustness__
 
+Please choose notebook kernel as `conda_python3`
+
 | Title | Studio lab |
 | :---: | ---: |
 | Part 1a: Create Guardrails| agents_with_guardrails/Part1a_create_guardrails_api.ipynb|
@@ -14,6 +16,11 @@ __Project : Using Bedrock Guardrails with Bedrock Agents to Improve Adversarial 
 
 
 ---
+## Download sqllite db file to run the labs 
+
+Make sure you have downloaded the sqllite db file as given in readMe(https://github.com/aws-samples/using-bedrock-guardrails-with-bedrock-agents-to-improve-adversarial-robustness/blob/main/agents_with_guardrails/retail-kb/readMe.txt) and place it in the same folder(retail-kb) as the readMe.txt file 
+---
+
 ## Security
 
 See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
