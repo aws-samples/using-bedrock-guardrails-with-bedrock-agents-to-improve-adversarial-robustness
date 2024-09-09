@@ -136,7 +136,7 @@ def setup_agent_infrastructure(schema_filename, kb_db_file_uri, lambda_code_uri)
     for policy in iam_client.list_policies()['Policies']:
         #print(policy)
         if bedrock_agent_bedrock_allow_policy_name in policy['PolicyName']:
-            agent_bedrock_policy_response = policy['Arn']
+            agent_bedrock_policy = policy['Arn']
         
         if bedrock_agent_s3_allow_policy_name in policy['PolicyName']:
             agent_s3_schema_policy = policy['Arn']
