@@ -1,4 +1,4 @@
-setuptools==58.2.0
+setuptools==70.0.0
 boto3==1.34.144
 botocore==1.34.162
 ipywidgets==8.1.2
