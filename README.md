@@ -16,7 +16,8 @@ Please choose notebook kernel as `conda_python3`
 
 
 ---
-## Download sqllite db file to run the labs 
+## Notebook execution requirement : Download sqllite db file to run the labs
+
 
 Make sure you have downloaded the sqllite db file as given in readMe(https://github.com/aws-samples/using-bedrock-guardrails-with-bedrock-agents-to-improve-adversarial-robustness/blob/main/agents_with_guardrails/retail-kb/readMe.txt) and place it in the same folder(retail-kb) as the readMe.txt file 
 ---
