@@ -15,6 +15,17 @@ model_kwargs =  {
     "stop_sequences": ["\n\nHuman"],
 }
 
+def test_llm_call(input_prompt):
+    llm = BedrockChat(client=bedrock_runtime_client, model_id=MODEL_ID, model_kwargs=model_kwargs)
+    messages = [HumanMessage(content=f"{input_prompt}")]
+    response = llm(messages)
+    
+    if str(type(response)) == "<class 'langchain_core.messages.ai.AIMessage'>":
+            response = response.content
+            response = response.strip()
+
+    return response
+
 
 def summarize_agent_trace(trace_file_base_path= "trace_files/", lab_number="2b", turn_number="1"):
 

@@ -43,6 +43,23 @@ sts_client = boto3.client('sts')
 iam_client = boto3.client('iam')
 s3_client = boto3.client('s3')
 lambda_client = boto3.client('lambda')
+from pathlib import Path
+
+
+def check_for_kb_files():
+    csbot_db_file_name = f"retail-kb/demo_csbot_db"
+    csbot_db_exists = False
+
+    
+    csbot_db_filepath = Path(csbot_db_file_name)
+    if csbot_db_filepath.is_file():
+        csbot_db_exists = True
+
+    if csbot_db_exists:
+        return True
+    else:
+        return False
+
 
 
 def generate_prefix_for_agent_infra():
