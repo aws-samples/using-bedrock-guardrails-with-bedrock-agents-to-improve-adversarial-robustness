@@ -3,6 +3,11 @@
 This repository contains a couple of notebooks for the __Bedrock Agents__ class at  __Amazon Machine Learning University__ . Our mission is to make Machine Learning accessible to everyone. We have courses available across many topics of machine learning and believe knowledge of ML can be a key enabler for success. These notebook represent some real-world use cases with Bedrock Agents.
 
 ---
+__AWS Blog Post__
+
+The AWS Blog post for this repository can be found in this link(https://aws.amazon.com/blogs/machine-learning/improve-llm-application-robustness-with-amazon-bedrock-guardrails-and-amazon-bedrock-agents/)
+
+---
 
 __Project : Using Bedrock Guardrails with Bedrock Agents to Improve Adversarial Robustness__
 
