@@ -5,7 +5,7 @@ This repository contains a couple of notebooks for the __Bedrock Agents__ class 
 ---
 __AWS Blog Post__
 
-The AWS Blog post for this repository can be found in this link(https://aws.amazon.com/blogs/machine-learning/improve-llm-application-robustness-with-amazon-bedrock-guardrails-and-amazon-bedrock-agents/)
+The __AWS Blog post__ for this repository can be found in this [link](https://aws.amazon.com/blogs/machine-learning/improve-llm-application-robustness-with-amazon-bedrock-guardrails-and-amazon-bedrock-agents/)
 
 ---
 
